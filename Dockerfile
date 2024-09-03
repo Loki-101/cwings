@@ -1,5 +1,5 @@
 # This image adds curl to Wings, making an internal health check possible
-FROM ghcr.io/pterodactyl/wings:v1.11.7
+FROM ghcr.io/pterodactyl/wings:${VERSION_TAG}
 
 # Copy curl and its dependencies (Depenencies gathered with "docker container run --rm curlimages/curl:latest ldd /usr/bin/curl"
 COPY --from=curlimages/curl:latest /usr/bin/curl /usr/bin/curl
