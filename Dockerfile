@@ -1,66 +1,29 @@
 # This image adds curl to Wings, making an internal health check possible
 ARG VERSION_TAG
-FROM ghcr.io/pterodactyl/wings:${VERSION_TAG}
+
+# Build stage
+FROM curlimages/curl:latest AS BUILD
+
+RUN mkdir -p /curl_deps/usr/bin /curl_deps/usr/lib /curl_deps/lib
 
 # Copy curl binary
-COPY --from=curlimages/curl:latest /usr/bin/curl /usr/bin/curl
+RUN cp /usr/bin/curl /curl_deps/usr/bin/
 
-# Used in COPY conditionals
-ARG TARGETARCH
+# Use ldd to identify dependencies and copy them, maintaining their paths
+RUN ldd /usr/bin/curl | grep -v dynamic | awk '{if ($3) print $3}' | \
+    while read -r lib; do \
+        if [[ $lib == /usr/lib/* ]]; then \
+            cp "$lib" "/curl_deps/usr/lib/$(basename $lib)"; \
+        elif [[ $lib == /lib/* ]]; then \
+            cp "$lib" "/curl_deps/lib/$(basename $lib)"; \
+        fi \
+    done
 
-# AMD64 curl dependencies
-# List obtained using docker container run --rm curlimages/curl:latest ldd /usr/bin/curl
-COPY --from=curlimages/curl:latest \
-    /lib/ld-musl-x86_64.so.1 \
-    /usr/lib/libcurl.so.4 \
-    /lib/libz.so.1 \
-    /lib/libc.musl-x86_64.so.1 \
-    /usr/lib/libnghttp2.so.14 \
-    /usr/lib/libidn2.so.0 \
-    /usr/lib/libssh2.so.1 \
-    /usr/lib/libpsl.so.5 \
-    /lib/libssl.so.3 \
-    /lib/libcrypto.so.3 \
-    /usr/lib/libgssapi_krb5.so.2 \
-    /usr/lib/libzstd.so.1 \
-    /usr/lib/libbrotlidec.so.1 \
-    /usr/lib/libunistring.so.5 \
-    /usr/lib/libkrb5.so.3 \
-    /usr/lib/libk5crypto.so.3 \
-    /lib/libcom_err.so.2 \
-    /usr/lib/libkrb5support.so.0 \
-    /usr/lib/libbrotlicommon.so.1 \
-    /usr/lib/libkeyutils.so.1 \
-    /lib/ \
-    /usr/lib/ \
-    if [ "$TARGETARCH" = "amd64" ]
+# Run stage
+FROM ghcr.io/pterodactyl/wings:${VERSION_TAG}
 
-# ARM64 curl dependencies
-# List obtained using docker run --rm --platform linux/arm64 curlimages/curl:latest ldd /usr/bin/curl
-COPY --from=curlimages/curl:latest \
-    /lib/ld-musl-aarch64.so.1 \
-    /usr/lib/libcurl.so.4 \
-    /lib/libz.so.1 \
-    /lib/libc.musl-aarch64.so.1 \
-    /usr/lib/libnghttp2.so.14 \
-    /usr/lib/libidn2.so.0 \
-    /usr/lib/libssh2.so.1 \
-    /usr/lib/libpsl.so.5 \
-    /lib/libssl.so.3 \
-    /lib/libcrypto.so.3 \
-    /usr/lib/libgssapi_krb5.so.2 \
-    /usr/lib/libzstd.so.1 \
-    /usr/lib/libbrotlidec.so.1 \
-    /usr/lib/libunistring.so.5 \
-    /usr/lib/libkrb5.so.3 \
-    /usr/lib/libk5crypto.so.3 \
-    /lib/libcom_err.so.2 \
-    /usr/lib/libkrb5support.so.0 \
-    /usr/lib/libbrotlicommon.so.1 \
-    /usr/lib/libkeyutils.so.1 \
-    /lib/ \
-    /usr/lib/ \
-    if [ "$TARGETARCH" = "arm64" ]
+# Copy curl and its dependencies from build stage
+COPY --from=BUILD /curl_deps/ /
 
-# Set library path
+# Set the library path
 ENV LD_LIBRARY_PATH=/lib:/usr/lib
