@@ -11,7 +11,7 @@ on:
     paths:
       - Dockerfile
   schedule:
-    - cron: '0 1 * *TUE'
+    - cron: '0 1 * * TUE'
 jobs:
   build_and_push:
     name: Build and Push Docker Image
