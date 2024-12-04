@@ -13,11 +13,10 @@ RUN cp /usr/bin/curl curl_deps/usr/bin/
 # Use ldd to identify dependencies and copy them, maintaining their paths
 RUN ldd /usr/bin/curl | grep '=>' | awk '{print $3}' | \
     while read -r lib; do \
-        if [[ $lib == /usr/lib/* ]]; then \
-            cp "$lib" "curl_deps/usr/lib/$(basename $lib)"; \
-        elif [[ $lib == /lib/* ]]; then \
-            cp "$lib" "curl_deps/lib/$(basename $lib)"; \
-        fi \
+        case "$lib" in \
+            /usr/lib/*) cp "$lib" "curl_deps/usr/lib/$(basename $lib)";; \
+            /lib/*) cp "$lib" "curl_deps/lib/$(basename $lib)";; \
+        esac; \
     done
 
 # Run stage
