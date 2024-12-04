@@ -5,10 +5,11 @@ FROM ghcr.io/pterodactyl/wings:${VERSION_TAG}
 # Copy curl binary
 COPY --from=curlimages/curl:latest /usr/bin/curl /usr/bin/curl
 
-# Copy architecture-specific libraries based on target platform
+# Used in COPY conditionals
 ARG TARGETARCH
 
-# AMD64 dependencies
+# AMD64 curl dependencies
+# List obtained using docker container run --rm curlimages/curl:latest ldd /usr/bin/curl
 COPY --from=curlimages/curl:latest \
     /lib/ld-musl-x86_64.so.1 \
     /usr/lib/libcurl.so.4 \
@@ -34,7 +35,8 @@ COPY --from=curlimages/curl:latest \
     /usr/lib/ \
     if [ "$TARGETARCH" = "amd64" ]
 
-# ARM64 dependencies
+# ARM64 curl dependencies
+# List obtained using docker run --rm --platform linux/arm64 curlimages/curl:latest ldd /usr/bin/curl
 COPY --from=curlimages/curl:latest \
     /lib/ld-musl-aarch64.so.1 \
     /usr/lib/libcurl.so.4 \
@@ -60,5 +62,5 @@ COPY --from=curlimages/curl:latest \
     /usr/lib/ \
     if [ "$TARGETARCH" = "arm64" ]
 
-# Set the library path to include both /lib and /usr/lib
+# Set library path
 ENV LD_LIBRARY_PATH=/lib:/usr/lib
