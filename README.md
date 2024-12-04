@@ -7,7 +7,7 @@ curl added to the Pterodactyl Panel Wings image for purposes of enabling an inte
 | AMD64        | :white_check_mark: Supported   |
 | ARM64        | :white_check_mark: Supported   |
 
-- Note: While the panel and Wings images provided will run fine on Arm64, most game servers _will not_, so if you are running Wings on an Arm64 machine, that's something to be aware of.
+- Note: While Wings (and this version of Wings with curl added) will run fine on Arm64, most game servers _will not_, so if you are running Wings on an Arm64 machine, that's something to be aware of.
 - If running Wings on a Rasberry Pi, see the following section posted by quintenqvd in the Pterodactyl Discord:
   > Running wings on a pi 4 or 5
   > Wings require docker cgroups. Those are not present in the ubuntu version only in the debian 11 or 12 one
