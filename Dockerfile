@@ -23,7 +23,8 @@ RUN ldd /usr/bin/curl | grep '=>' | awk '{print $3}' | \
 FROM ghcr.io/pterodactyl/wings:${VERSION_TAG}
 
 # Copy curl and its dependencies from build stage
-COPY --from=build /build/curl_deps/ /
+COPY --from=build /build/curl_deps/usr /usr
+COPY --from=build /build/curl_deps/lib /lib
 
 # Set the library path
 ENV LD_LIBRARY_PATH=/lib:/usr/lib
