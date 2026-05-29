@@ -19,7 +19,7 @@ curl added to the Pterodactyl Panel Wings image for purposes of enabling an inte
 ### Latest (recommended)
 - v1.12.2
   ```
-  ghcr.io/loki-101/cwings:v1.12.2
+  ghcr.io/loki-101/cwings:v1.12.3
   ```
 
 ### Old
@@ -55,3 +55,5 @@ curl added to the Pterodactyl Panel Wings image for purposes of enabling an inte
   `ghcr.io/loki-101/cwings:v1.12.0`
 - v1.12.1
   `ghcr.io/loki-101/cwings:v1.12.1`
+- v1.12.2
+  `ghcr.io/loki-101/cwings:v1.12.2`
