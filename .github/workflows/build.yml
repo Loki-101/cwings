@@ -2,8 +2,8 @@ name: Build and Push Docker Images
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Version to build (optional)'
+      branch:
+        description: 'Branch to build (optional)'
         required: false
   push:
     branches:
@@ -16,7 +16,6 @@ jobs:
   build_and_push:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
-    if: inputs.version == '' || inputs.version == matrix.version
     env:
       LATEST_VERSION: v1.13.2 # Determines :latest tag
     strategy:
@@ -47,6 +46,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || 'refs/heads/main' }}
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Set up QEMU
